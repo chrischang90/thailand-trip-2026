@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🇹🇭 Thailand Trip 2025</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
+
+    header { background: #1a73e8; color: white; padding: 16px 20px; text-align: center; }
+    header h1 { font-size: 22px; }
+    header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+    nav { display: flex; background: white; border-bottom: 1px solid #ddd; overflow-x: auto; }
+    nav button { flex: 1; padding: 14px 8px; border: none; background: none; font-size: 13px; cursor: pointer; color: #666; white-space: nowrap; }
+    nav button.active { color: #1a73e8; border-bottom: 2px solid #1a73e8; font-weight: 600; }
+
+    .section { display: none; padding: 16px; max-width: 800px; margin: 0 auto; }
+    .section.active { display: block; }
+
+    .card { background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .card h3 { font-size: 15px; color: #1a73e8; margin-bottom: 10px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: #f0f4ff; color: #555; text-align: left; padding: 8px; }
+    td { padding: 8px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge.confirmed { background: #e6f4ea; color: #2d7a3a; }
+    .badge.tbd { background: #fff3e0; color: #e65c00; }
+
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+    .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 4px; }
+    .btn:active { background: #1558b0; }
+
+    .day-header { background: #e8f0fe; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #1a73e8; }
+
+    .total-row { background: #f0f4ff; font-weight: 700; }
+
+    .status-msg { text-align: center; padding: 10px; font-size: 13px; color: #888; }
+    .success-msg { color: #2d7a3a; }
+    .error-msg { color: #c0392b; }
+
+    .add-toggle { background: none; border: 1px dashed #1a73e8; color: #1a73e8; padding: 8px; border-radius: 6px; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 12px; }
+    .add-form { display: none; background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .add-form.open { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🇹🇭 Thailand Trip 2025</h1>
+  <p>May 1–8 &nbsp;·&nbsp; Bangkok & Pattaya &nbsp;·&nbsp; 2 Travelers</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('itinerary')">📅 Itinerary</button>
+  <button onclick="showTab('accommodation')">🏨 Hotels</button>
+  <button onclick="showTab('budget')">💰 Budget</button>
+</nav>
+
+<!-- ITINERARY -->
+<div id="itinerary" class="section active">
+
+  <button class="add-toggle" onclick="toggleForm('add-itinerary')">+ Add Activity</button>
+  <div id="add-itinerary" class="add-form">
+    <h3>New Activity</h3>
+    <div class="form-group"><label>Date</label>
+      <select id="i-date">
+        <option value="May 1">May 1 (Friday)</option>
+        <option value="May 2">May 2 (Saturday)</option>
+        <option value="May 3">May 3 (Sunday)</option>
+        <option value="May 4">May 4 (Monday)</option>
+        <option value="May 5">May 5 (Tuesday)</option>
+        <option value="May 6">May 6 (Wednesday)</option>
+        <option value="May 7">May 7 (Thursday)</option>
+        <option value="May 8">May 8 (Friday)</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Time</label><input id="i-time" placeholder="7:30pm"/></div>
+    <div class="form-group"><label>Activity</label><input id="i-activity" placeholder="Dinner @ Fuego"/></div>
+    <div class="form-group"><label>Category</label>
+      <select id="i-category">
+        <option>Food</option><option>Spa</option><option>Shopping</option><option>Transport</option><option>Hotel</option><option>Activity</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Notes</label><input id="i-notes" placeholder="Reservation at 7:30pm"/></div>
+    <button class="btn" onclick="addItinerary()">Save Activity</button>
+    <p id="i-status" class="status-msg"></p>
+  </div>
+
+  <div id="itinerary-list"></div>
+</div>
+
+<!-- ACCOMMODATION -->
+<div id="accommodation" class="section">
+
+  <button class="add-toggle" onclick="toggleForm('add-accommodation')">+ Add Hotel</button>
+  <div id="add-accommodation" class="add-form">
+    <h3>New Hotel</h3>
+    <div class="form-group"><label>Dates</label><input id="a-dates" placeholder="May 1–4"/></div>
+    <div class="form-group"><label>Hotel</label><input id="a-hotel" placeholder="InterContinental Bangkok"/></div>
+    <div class="form-group"><label>Location</label><input id="a-location" placeholder="Bangkok"/></div>
+    <div class="form-group"><label>Status</label>
+      <select id="a-status"><option>Confirmed</option><option>TBD</option><option>Cancelled</option></select>
+    </div>
+    <button class="btn" onclick="addAccommodation()">Save Hotel</button>
+    <p id="a-status-msg" class="status-msg"></p>
+  </div>
+
+  <div id="accommodation-list"></div>
+</div>
+
+<!-- BUDGET -->
+<div id="budget" class="section">
+
+  <button class="add-toggle" onclick="toggleForm('add-budget')">+ Add Expense</button>
+  <div id="add-budget" class="add-form">
+    <h3>New Expense</h3>
+    <div class="form-group"><label>Category</label>
+      <select id="b-category">
+        <option>Accommodation</option><option>Food</option><option>Spa</option><option>Shopping</option><option>Transport</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Item</label><input id="b-item" placeholder="Dinner @ Fuego"/></div>
+    <div class="form-group"><label>Estimated Cost (USD)</label><input id="b-estimated" type="number" placeholder="0"/></div>
+    <div class="form-group"><label>Actual Cost (USD)</label><input id="b-actual" type="number" placeholder="0"/></div>
+    <div class="form-group"><label>Status</label>
+      <select id="b-status"><option>Planned</option><option>Paid</option><option>TBD</option></select>
+    </div>
+    <button class="btn" onclick="addBudget()">Save Expense</button>
+    <p id="b-status-msg" class="status-msg"></p>
+  </div>
+
+  <div id="budget-list"></div>
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbyHwoHqMnpW38rW1Ee-JpJ6VJSGH5uX0HMeyin2zFEdvqeLO1yJgG2-lmmYeZ119W_8/exec';
+
+// Preloaded data
+const preloadedItinerary = [
+  { Date: 'May 1', Time: '2:30pm', Activity: 'Yunomori Onsen & Spa', Category: 'Spa', Notes: 'Sukhumvit Soi 26' },
+  { Date: 'May 1', Time: '7:30pm', Activity: 'Dinner @ Fuego', Category: 'Food', Notes: 'Reservation confirmed' },
+  { Date: 'May 2', Time: 'TBD', Activity: 'Dusit Central Park', Category: 'Shopping', Notes: '' },
+  { Date: 'May 2', Time: '7:30pm', Activity: 'Dinner @ Si Sawat BKK', Category: 'Food', Notes: 'Reservation confirmed' },
+  { Date: 'May 3', Time: '1:30pm', Activity: 'Lunch @ Hotaru 119 Omakase', Category: 'Food', Notes: 'Sanampao location' },
+  { Date: 'May 4', Time: 'TBD', Activity: 'Check out & travel to Pattaya', Category: 'Transport', Notes: '~2 hrs drive' },
+];
+
+const preloadedAccommodation = [
+  { Dates: 'May 1–4', Hotel: 'InterContinental Bangkok Sukhumvit', Location: 'Bangkok', Status: 'Confirmed' },
+  { Dates: 'May 4–6', Hotel: 'TBD', Location: 'Pattaya', Status: 'TBD' },
+  { Dates: 'May 6–8', Hotel: 'InterContinental Pattaya Resort', Location: 'Pattaya', Status: 'Confirmed' },
+];
+
+const preloadedBudget = [
+  { Category: 'Accommodation', Item: 'InterContinental Bangkok (3 nights)', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'Confirmed' },
+  { Category: 'Accommodation', Item: 'May 4–6 Hotel', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'TBD' },
+  { Category: 'Accommodation', Item: 'InterContinental Pattaya (2 nights)', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'Confirmed' },
+  { Category: 'Food', Item: 'Fuego (2 pax)', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'Planned' },
+  { Category: 'Food', Item: 'Si Sawat BKK (2 pax)', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'Planned' },
+  { Category: 'Food', Item: 'Hotaru 119 Omakase (2 pax)', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'Planned' },
+  { Category: 'Spa', Item: 'Yunomori Onsen & Spa', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'Planned' },
+  { Category: 'Shopping', Item: 'Dusit Central Park', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'Planned' },
+  { Category: 'Transport', Item: 'Bangkok → Pattaya', 'Estimated Cost (USD)': '', 'Actual Cost': '', Status: 'Planned' },
+];
+
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function toggleForm(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+async function fetchData(tab) {
+  try {
+    const res = await fetch(`${API}?tab=${tab}`);
+    return await res.json();
+  } catch { return []; }
+}
+
+function formatTime(val) {
+  if (!val) return '';
+  const s = String(val);
+  if (s.includes('T') && s.includes('Z')) {
+    const d = new Date(s);
+    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+  return s;
+}
+
+async function postData(tab, row) {
+  await fetch(API, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify({ tab, row }),
+  });
+}
+
+async function deleteRemote(tab, rowIndex) {
+  await fetch(API, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify({ action: 'delete', tab, rowIndex }),
+  });
+}
+
+function getDeleted(tab) {
+  return JSON.parse(localStorage.getItem(`deleted_${tab}`) || '[]');
+}
+
+function saveDeleted(tab, key) {
+  const list = getDeleted(tab);
+  if (!list.includes(key)) list.push(key);
+  localStorage.setItem(`deleted_${tab}`, JSON.stringify(list));
+}
+
+function deleteBtn(onclick) {
+  return `<td><button onclick="${onclick}" style="background:none;border:none;color:#c0392b;font-size:16px;cursor:pointer;padding:2px 6px;">×</button></td>`;
+}
+
+// RENDER ITINERARY
+async function renderItinerary() {
+  const remote = await fetchData('Itinerary');
+  const deletedPreload = getDeleted('Itinerary_pre');
+  const deletedRemote = getDeleted('Itinerary');
+
+  const preload = preloadedItinerary
+    .filter((_, i) => !deletedPreload.includes(String(i)))
+    .map(r => ({ ...r, _pre: true }));
+
+  const remoteFiltered = remote.filter(r => !deletedRemote.includes(String(r._row)));
+  const all = [...preload, ...remoteFiltered];
+
+  const grouped = {};
+  all.forEach(r => {
+    const d = r.Date || 'TBD';
+    if (!grouped[d]) grouped[d] = [];
+    grouped[d].push(r);
+  });
+
+  const dayOfWeek = {
+    'May 1': 'Friday', 'May 2': 'Saturday', 'May 3': 'Sunday',
+    'May 4': 'Monday', 'May 5': 'Tuesday', 'May 6': 'Wednesday',
+    'May 7': 'Thursday', 'May 8': 'Friday'
+  };
+
+  const days = Object.keys(grouped).sort((a, b) => {
+    const parse = d => { const m = d.match(/(\d+)/); return m ? parseInt(m[1]) : 99; };
+    return parse(a) - parse(b);
+  });
+
+  let preIdx = 0;
+  const fullPreload = preloadedItinerary;
+
+  let html = '';
+  days.forEach(day => {
+    const dow = dayOfWeek[day] ? ` · ${dayOfWeek[day]}` : '';
+    html += `<div class="day-header">📅 ${day}${dow}</div>`;
+    html += `<div class="card"><table><tr><th>Time</th><th>Activity</th><th>Category</th><th>Notes</th><th></th></tr>`;
+    grouped[day].forEach(r => {
+      if (r._pre) {
+        const origIdx = fullPreload.findIndex(p => p.Activity === r.Activity && p.Date === r.Date && p.Time === r.Time);
+        html += `<tr><td>${formatTime(r.Time)}</td><td>${r.Activity||''}</td><td>${r.Category||''}</td><td>${r.Notes||''}</td>${deleteBtn(`deletePreload('Itinerary_pre',${origIdx},renderItinerary)`)}</tr>`;
+      } else {
+        html += `<tr><td>${formatTime(r.Time)}</td><td>${r.Activity||''}</td><td>${r.Category||''}</td><td>${r.Notes||''}</td>${deleteBtn(`deleteSheetRow('Itinerary',${r._row},renderItinerary)`)}</tr>`;
+      }
+    });
+    html += `</table></div>`;
+  });
+  document.getElementById('itinerary-list').innerHTML = html;
+}
+
+// RENDER ACCOMMODATION
+async function renderAccommodation() {
+  const remote = await fetchData('Accommodation');
+  const deletedPre = getDeleted('Accommodation_pre');
+  const deletedRemote = getDeleted('Accommodation');
+
+  const preload = preloadedAccommodation
+    .filter((_, i) => !deletedPre.includes(String(i)))
+    .map(r => ({ ...r, _pre: true }));
+
+  const remoteFiltered = remote.filter(r => !deletedRemote.includes(String(r._row)));
+  const all = [...preload, ...remoteFiltered];
+
+  let html = '<div class="card"><table><tr><th>Dates</th><th>Hotel</th><th>Location</th><th>Status</th><th></th></tr>';
+  all.forEach((r, i) => {
+    const badge = r.Status === 'Confirmed' ? 'confirmed' : 'tbd';
+    if (r._pre) {
+      const origIdx = preloadedAccommodation.findIndex(p => p.Hotel === r.Hotel && p.Dates === r.Dates);
+      html += `<tr><td>${r.Dates||''}</td><td>${r.Hotel||''}</td><td>${r.Location||''}</td><td><span class="badge ${badge}">${r.Status||''}</span></td>${deleteBtn(`deletePreload('Accommodation_pre',${origIdx},renderAccommodation)`)}</tr>`;
+    } else {
+      html += `<tr><td>${r.Dates||''}</td><td>${r.Hotel||''}</td><td>${r.Location||''}</td><td><span class="badge ${badge}">${r.Status||''}</span></td>${deleteBtn(`deleteSheetRow('Accommodation',${r._row},renderAccommodation)`)}</tr>`;
+    }
+  });
+  html += '</table></div>';
+  document.getElementById('accommodation-list').innerHTML = html;
+}
+
+// RENDER BUDGET
+async function renderBudget() {
+  const remote = await fetchData('Budget');
+  const deletedPre = getDeleted('Budget_pre');
+  const deletedRemote = getDeleted('Budget');
+
+  const preload = preloadedBudget
+    .filter((_, i) => !deletedPre.includes(String(i)))
+    .map(r => ({ ...r, _pre: true }));
+
+  const remoteFiltered = remote.filter(r => !deletedRemote.includes(String(r._row)));
+  const all = [...preload, ...remoteFiltered];
+
+  let totalEst = 0, totalAct = 0;
+  all.forEach(r => {
+    totalEst += parseFloat(r['Estimated Cost (USD)']) || 0;
+    totalAct += parseFloat(r['Actual Cost']) || 0;
+  });
+
+  let html = '<div class="card"><table><tr><th>Category</th><th>Item</th><th>Est. (USD)</th><th>Actual (USD)</th><th>Status</th><th></th></tr>';
+  all.forEach(r => {
+    if (r._pre) {
+      const origIdx = preloadedBudget.findIndex(p => p.Item === r.Item && p.Category === r.Category);
+      html += `<tr><td>${r.Category||''}</td><td>${r.Item||''}</td><td>${r['Estimated Cost (USD)']||'—'}</td><td>${r['Actual Cost']||'—'}</td><td>${r.Status||''}</td>${deleteBtn(`deletePreload('Budget_pre',${origIdx},renderBudget)`)}</tr>`;
+    } else {
+      html += `<tr><td>${r.Category||''}</td><td>${r.Item||''}</td><td>${r['Estimated Cost (USD)']||'—'}</td><td>${r['Actual Cost']||'—'}</td><td>${r.Status||''}</td>${deleteBtn(`deleteSheetRow('Budget',${r._row},renderBudget)`)}</tr>`;
+    }
+  });
+  html += `<tr class="total-row"><td colspan="2">Total</td><td>$${totalEst.toFixed(2)}</td><td>$${totalAct.toFixed(2)}</td><td></td><td></td></tr>`;
+  html += '</table></div>';
+  document.getElementById('budget-list').innerHTML = html;
+}
+
+function deletePreload(tab, idx, rerender) {
+  if (!confirm('Delete this item?')) return;
+  saveDeleted(tab, String(idx));
+  rerender();
+}
+
+async function deleteSheetRow(tab, rowIndex, rerender) {
+  if (!confirm('Delete this item?')) return;
+  saveDeleted(tab, String(rowIndex));
+  await deleteRemote(tab, rowIndex);
+  setTimeout(rerender, 2000);
+}
+
+// ADD FUNCTIONS
+async function addItinerary() {
+  const row = [
+    document.getElementById('i-date').value,
+    document.getElementById('i-time').value,
+    document.getElementById('i-activity').value,
+    document.getElementById('i-category').value,
+    document.getElementById('i-notes').value,
+  ];
+  document.getElementById('i-status').textContent = 'Saving...';
+  await postData('Itinerary', row);
+  document.getElementById('i-status').textContent = '✓ Saved! Refreshing...';
+  document.getElementById('i-status').className = 'status-msg success-msg';
+  setTimeout(() => renderItinerary(), 2000);
+}
+
+async function addAccommodation() {
+  const row = [
+    document.getElementById('a-dates').value,
+    document.getElementById('a-hotel').value,
+    document.getElementById('a-location').value,
+    document.getElementById('a-status').value,
+  ];
+  document.getElementById('a-status-msg').textContent = 'Saving...';
+  await postData('Accommodation', row);
+  document.getElementById('a-status-msg').textContent = '✓ Saved! Refreshing...';
+  document.getElementById('a-status-msg').className = 'status-msg success-msg';
+  setTimeout(() => renderAccommodation(), 2000);
+}
+
+async function addBudget() {
+  const row = [
+    document.getElementById('b-category').value,
+    document.getElementById('b-item').value,
+    document.getElementById('b-estimated').value,
+    document.getElementById('b-actual').value,
+    document.getElementById('b-status').value,
+  ];
+  document.getElementById('b-status-msg').textContent = 'Saving...';
+  await postData('Budget', row);
+  document.getElementById('b-status-msg').textContent = '✓ Saved! Refreshing...';
+  document.getElementById('b-status-msg').className = 'status-msg success-msg';
+  setTimeout(() => renderBudget(), 2000);
+}
+
+// Init
+renderItinerary();
+renderAccommodation();
+renderBudget();
+</script>
+</body>
+</html>
