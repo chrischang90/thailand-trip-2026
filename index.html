@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🇹🇭 Thailand Trip 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
+
+    header { background: #0a1628; color: white; padding: 16px 20px; text-align: center; }
+    header h1 { font-size: 22px; }
+    header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+    nav { display: flex; background: white; border-bottom: 1px solid #ddd; overflow-x: auto; }
+    nav button { flex: 1; padding: 14px 8px; border: none; background: none; font-size: 13px; cursor: pointer; color: #666; white-space: nowrap; }
+    nav button.active { color: #1a73e8; border-bottom: 2px solid #1a73e8; font-weight: 600; }
+
+    .section { display: none; padding: 16px; max-width: 800px; margin: 0 auto; }
+    .section.active { display: block; }
+
+    .card { background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .card h3 { font-size: 15px; color: #1a73e8; margin-bottom: 10px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    th { background: #f0f4ff; color: #555; text-align: left; padding: 8px; overflow: hidden; }
+    td { padding: 8px; border-bottom: 1px solid #f0f0f0; vertical-align: top; word-break: break-word; }
+    tr:last-child td { border-bottom: none; }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+    .badge.confirmed { background: #e6f4ea; color: #2d7a3a; }
+    .badge.tbd { background: #fff3e0; color: #e65c00; }
+
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+    .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 4px; }
+    .btn:active { background: #1558b0; }
+
+    .day-header { background: #e8f0fe; padding: 8px 12px; border-radius: 6px; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #1a73e8; }
+
+    .total-row { background: #f0f4ff; font-weight: 700; }
+
+    .status-msg { text-align: center; padding: 10px; font-size: 13px; color: #888; }
+    .success-msg { color: #2d7a3a; }
+    .error-msg { color: #c0392b; }
+
+    .add-toggle { background: none; border: 1px dashed #1a73e8; color: #1a73e8; padding: 8px; border-radius: 6px; font-size: 13px; cursor: pointer; width: 100%; margin-bottom: 12px; }
+    .add-form { display: none; background: white; border-radius: 10px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .add-form.open { display: block; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: white; border-radius: 12px; padding: 20px; margin: 16px; width: 100%; max-width: 420px; box-shadow: 0 4px 24px rgba(0,0,0,0.18); }
+    .modal-box h3 { font-size: 15px; color: #1a73e8; margin-bottom: 14px; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-secondary { background: #f0f0f0; color: #333; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; flex: 1; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🇹🇭 Thailand Trip 2026</h1>
+  <p>May 1–8 &nbsp;·&nbsp; Bangkok & Pattaya &nbsp;·&nbsp; 2 Travelers</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('itinerary')">📅 Itinerary</button>
+  <button onclick="showTab('accommodation')">🏨 Hotels</button>
+  <button onclick="showTab('budget')">💰 Budget</button>
+</nav>
+
+<!-- ITINERARY -->
+<div id="itinerary" class="section active">
+
+  <button class="add-toggle" onclick="toggleForm('add-itinerary')">+ Add Activity</button>
+  <div id="add-itinerary" class="add-form">
+    <h3>New Activity</h3>
+    <div class="form-group"><label>Date</label>
+      <select id="i-date">
+        <option value="May 1">May 1 (Friday)</option>
+        <option value="May 2">May 2 (Saturday)</option>
+        <option value="May 3">May 3 (Sunday)</option>
+        <option value="May 4">May 4 (Monday)</option>
+        <option value="May 5">May 5 (Tuesday)</option>
+        <option value="May 6">May 6 (Wednesday)</option>
+        <option value="May 7">May 7 (Thursday)</option>
+        <option value="May 8">May 8 (Friday)</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Time</label><select id="i-time"></select></div>
+    <div class="form-group"><label>Activity</label><input id="i-activity" placeholder="Dinner @ Fuego"/></div>
+    <div class="form-group"><label>Category</label>
+      <select id="i-category">
+        <option>Food</option><option>Spa</option><option>Shopping</option><option>Transport</option><option>Hotel</option><option>Activity</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Notes</label><input id="i-notes" placeholder="Reservation at 7:30pm"/></div>
+    <button class="btn" onclick="addItinerary()">Save Activity</button>
+    <p id="i-status" class="status-msg"></p>
+  </div>
+
+  <div id="itinerary-list"></div>
+</div>
+
+<!-- ACCOMMODATION -->
+<div id="accommodation" class="section">
+
+  <button class="add-toggle" onclick="toggleForm('add-accommodation')">+ Add Hotel</button>
+  <div id="add-accommodation" class="add-form">
+    <h3>New Hotel</h3>
+    <div class="form-group"><label>Dates</label><input id="a-dates" placeholder="May 1–4"/></div>
+    <div class="form-group"><label>Hotel</label><input id="a-hotel" placeholder="InterContinental Bangkok"/></div>
+    <div class="form-group"><label>Location</label><input id="a-location" placeholder="Bangkok"/></div>
+    <div class="form-group"><label>Status</label>
+      <select id="a-status"><option>Confirmed</option><option>TBD</option><option>Cancelled</option></select>
+    </div>
+    <button class="btn" onclick="addAccommodation()">Save Hotel</button>
+    <p id="a-status-msg" class="status-msg"></p>
+  </div>
+
+  <div id="accommodation-list"></div>
+</div>
+
+<!-- BUDGET -->
+<div id="budget" class="section">
+
+  <button class="add-toggle" onclick="toggleForm('add-budget')">+ Add Expense</button>
+  <div id="add-budget" class="add-form">
+    <h3>New Expense</h3>
+    <div class="form-group"><label>Category</label>
+      <select id="b-category">
+        <option>Accommodation</option><option>Food</option><option>Spa</option><option>Shopping</option><option>Transport</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Item</label><input id="b-item" placeholder="Dinner @ Fuego"/></div>
+    <div class="form-group"><label>Estimated Cost (USD)</label><input id="b-estimated" type="number" placeholder="0"/></div>
+    <div class="form-group"><label>Actual Cost (USD)</label><input id="b-actual" type="number" placeholder="0"/></div>
+    <div class="form-group"><label>Status</label>
+      <select id="b-status"><option>Planned</option><option>Paid</option><option>TBD</option></select>
+    </div>
+    <button class="btn" onclick="addBudget()">Save Expense</button>
+    <p id="b-status-msg" class="status-msg"></p>
+  </div>
+
+  <div id="budget-list"></div>
+</div>
+
+<!-- EDIT HOTEL MODAL -->
+<div id="edit-acc-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Edit Hotel</h3>
+    <div class="form-group"><label>Dates</label><input id="ea-dates"/></div>
+    <div class="form-group"><label>Hotel</label><input id="ea-hotel"/></div>
+    <div class="form-group"><label>Location</label><input id="ea-location"/></div>
+    <div class="form-group"><label>Status</label>
+      <select id="ea-status"><option>Confirmed</option><option>TBD</option><option>Cancelled</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeEditAcc()">Cancel</button>
+      <button class="btn" style="flex:1" onclick="saveEditAcc()">Save</button>
+    </div>
+    <p id="ea-status-msg" class="status-msg"></p>
+  </div>
+</div>
+
+<!-- EDIT BUDGET MODAL -->
+<div id="edit-budget-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Edit Expense</h3>
+    <div class="form-group"><label>Category</label>
+      <select id="eb-category">
+        <option>Accommodation</option><option>Food</option><option>Spa</option><option>Shopping</option><option>Transport</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Item</label><input id="eb-item"/></div>
+    <div class="form-group"><label>Estimated Cost (USD)</label><input id="eb-estimated" type="number"/></div>
+    <div class="form-group"><label>Actual Cost (USD)</label><input id="eb-actual" type="number"/></div>
+    <div class="form-group"><label>Status</label>
+      <select id="eb-status"><option>Planned</option><option>Paid</option><option>TBD</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeEditBudget()">Cancel</button>
+      <button class="btn" style="flex:1" onclick="saveEditBudget()">Save</button>
+    </div>
+    <p id="eb-status-msg" class="status-msg"></p>
+  </div>
+</div>
+
+<!-- EDIT ITINERARY MODAL -->
+<div id="edit-modal" class="modal-overlay">
+  <div class="modal-box">
+    <h3>Edit Activity</h3>
+    <div class="form-group"><label>Date</label>
+      <select id="ei-date">
+        <option value="May 1">May 1 (Friday)</option>
+        <option value="May 2">May 2 (Saturday)</option>
+        <option value="May 3">May 3 (Sunday)</option>
+        <option value="May 4">May 4 (Monday)</option>
+        <option value="May 5">May 5 (Tuesday)</option>
+        <option value="May 6">May 6 (Wednesday)</option>
+        <option value="May 7">May 7 (Thursday)</option>
+        <option value="May 8">May 8 (Friday)</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Time</label><select id="ei-time"></select></div>
+    <div class="form-group"><label>Activity</label><input id="ei-activity"/></div>
+    <div class="form-group"><label>Category</label>
+      <select id="ei-category">
+        <option>Food</option><option>Spa</option><option>Shopping</option><option>Transport</option><option>Hotel</option><option>Activity</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Notes</label><input id="ei-notes"/></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+      <button class="btn" style="flex:1" onclick="saveEditItinerary()">Save</button>
+    </div>
+    <p id="ei-status" class="status-msg"></p>
+  </div>
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbyHwoHqMnpW38rW1Ee-JpJ6VJSGH5uX0HMeyin2zFEdvqeLO1yJgG2-lmmYeZ119W_8/exec';
+
+// Preloaded data
+const preloadedItinerary = [];
+const preloadedAccommodation = [];
+const preloadedBudget = [];
+
+function showTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function toggleForm(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+async function fetchData(tab) {
+  try {
+    const res = await fetch(`${API}?tab=${tab}`);
+    return await res.json();
+  } catch { return []; }
+}
+
+// Convert "May 6" → "D06" so Google Sheets stores it as text, not a date
+function toDateCode(mayStr) {
+  const m = String(mayStr).match(/(\d+)/);
+  return m ? `D${String(parseInt(m[1])).padStart(2,'0')}` : mayStr;
+}
+
+// Convert "3:30pm" → "T1530" so Google Sheets stores it as text, not a time serial
+function toTimeCode(timeStr) {
+  if (!timeStr || timeStr === 'TBD') return 'TBD';
+  const s = String(timeStr).trim();
+  const m = s.match(/^(\d+):(\d+)\s*(am|pm)$/i);
+  if (m) {
+    let h = parseInt(m[1]);
+    const min = parseInt(m[2]);
+    const ampm = m[3].toLowerCase();
+    if (ampm === 'pm' && h !== 12) h += 12;
+    if (ampm === 'am' && h === 12) h = 0;
+    return `T${String(h).padStart(2,'0')}${String(min).padStart(2,'0')}`;
+  }
+  return s;
+}
+
+// "T1530" → "3:30pm" (for dropdown matching and display)
+function decodeTimeCode(s) {
+  const m = String(s).match(/^T(\d{2})(\d{2})$/);
+  if (!m) return s;
+  let h = parseInt(m[1]);
+  const min = String(parseInt(m[2])).padStart(2,'0');
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  return `${h12}:${min}${ampm}`;
+}
+
+function formatTime(val) {
+  if (!val || val === 'TBD') return 'TBD';
+  const s = String(val).trim();
+  // Our stored code format: "T1530"
+  if (/^T\d{4}$/.test(s)) return decodeTimeCode(s);
+  // ISO datetime from Sheets (Excel epoch 1899-12-30 for time-only values)
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+    const d = new Date(s);
+    const h = d.getUTCHours();
+    const min = String(d.getUTCMinutes()).padStart(2,'0');
+    const ampm = h >= 12 ? 'pm' : 'am';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${h12}:${min}${ampm}`;
+  }
+  return s;
+}
+
+// Returns time as "3:30pm" style for dropdown matching
+function normalizeTimeForDropdown(val) {
+  if (!val || val === 'TBD') return 'TBD';
+  const s = String(val).trim();
+  if (/^T\d{4}$/.test(s)) return decodeTimeCode(s);
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+    const d = new Date(s);
+    const h = d.getUTCHours();
+    const min = String(d.getUTCMinutes()).padStart(2,'0');
+    const ampm = h >= 12 ? 'pm' : 'am';
+    const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${h12}:${min}${ampm}`;
+  }
+  // Normalize "3:30 PM" → "3:30pm"
+  return s.toLowerCase().replace(/\s+/g,'');
+}
+
+function normalizeDate(val) {
+  if (!val) return 'TBD';
+  const s = String(val).trim();
+  if (/^May \d+/.test(s)) return s;
+  // Our stored code format: "D06" → "May 6"
+  if (/^D\d{2}$/.test(s)) return `May ${parseInt(s.slice(1))}`;
+  // ISO datetime (from old data or Sheets auto-parsing) — use Bangkok UTC+7
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s) || /^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const d = new Date(new Date(s).getTime() + 7 * 60 * 60 * 1000);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[d.getUTCMonth()]} ${d.getUTCDate()}`;
+  }
+  return s;
+}
+
+// Known non-Activity keys in remote row objects
+const _knownKeys = new Set(['Date','Time','Category','Notes','_row','_pre','Status','Dates','Hotel','Location','Item','Estimated Cost (USD)','Actual Cost']);
+
+function resolveActivity(r) {
+  if (r.Activity) return r.Activity;
+  // Google Sheets may return Activity under a different column header key
+  // Find any string field that isn't one of the known schema keys
+  for (const [k, v] of Object.entries(r)) {
+    if (!_knownKeys.has(k) && !k.startsWith('_') && v && typeof v === 'string') return v;
+  }
+  return '';
+}
+
+function parseTimeMinutes(val) {
+  if (!val || val === 'TBD') return 9999;
+  const s = String(val).trim();
+  // "T1530" stored code
+  if (/^T\d{4}$/.test(s)) return parseInt(s.slice(1,3)) * 60 + parseInt(s.slice(3));
+  // ISO datetime from Sheets (use UTC hours — works for Excel epoch time-only values)
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+    const d = new Date(s);
+    return d.getUTCHours() * 60 + d.getUTCMinutes();
+  }
+  const m = s.match(/(\d+):(\d+)\s*(am|pm)/i);
+  if (m) {
+    let h = parseInt(m[1]);
+    const min = parseInt(m[2]);
+    if (m[3].toLowerCase() === 'pm' && h !== 12) h += 12;
+    if (m[3].toLowerCase() === 'am' && h === 12) h = 0;
+    return h * 60 + min;
+  }
+  return 9999;
+}
+
+function buildTimeOptions(selId, selectedVal) {
+  const sel = document.getElementById(selId);
+  sel.innerHTML = '';
+  const tbd = document.createElement('option');
+  tbd.value = 'TBD'; tbd.textContent = 'TBD';
+  if (!selectedVal || selectedVal === 'TBD') tbd.selected = true;
+  sel.appendChild(tbd);
+  for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const ampm = h < 12 ? 'am' : 'pm';
+      const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      const label = `${h12}:${String(m).padStart(2,'0')}${ampm}`;
+      const opt = document.createElement('option');
+      opt.value = label;
+      opt.textContent = label;
+      if (selectedVal && label === selectedVal) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+}
+
+function populateTimeDropdown() {
+  buildTimeOptions('i-time', null);
+  buildTimeOptions('ei-time', null);
+}
+
+let _iItems = [];
+let _editIdx = null;
+
+function setSelectValue(id, val) {
+  const sel = document.getElementById(id);
+  let matched = false;
+  Array.from(sel.options).forEach(opt => {
+    opt.selected = (opt.value === val);
+    if (opt.value === val) matched = true;
+  });
+  if (!matched && sel.options.length) sel.options[0].selected = true;
+}
+
+function openEditItinerary(idx) {
+  _editIdx = idx;
+  const item = _iItems[idx];
+  const dateVal = normalizeDate(item.Date);
+  const timeVal = normalizeTimeForDropdown(item.Time);
+
+  buildTimeOptions('ei-time', timeVal);
+  setSelectValue('ei-date', dateVal);
+  setSelectValue('ei-category', item.Category || 'Activity');
+  document.getElementById('ei-activity').value = resolveActivity(item);
+  document.getElementById('ei-notes').value = item.Notes || '';
+  document.getElementById('ei-status').textContent = '';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  _editIdx = null;
+}
+
+async function saveEditItinerary() {
+  const item = _iItems[_editIdx];
+  const newRow = [
+    toDateCode(document.getElementById('ei-date').value),   // "May 6" → "D06"
+    toTimeCode(document.getElementById('ei-time').value),   // "3:30pm" → "T1530"
+    document.getElementById('ei-activity').value,
+    document.getElementById('ei-category').value,
+    document.getElementById('ei-notes').value,
+  ];
+  document.getElementById('ei-status').textContent = 'Saving...';
+
+  if (item._pre) {
+    const activity = resolveActivity(item);
+    const origIdx = preloadedItinerary.findIndex(p =>
+      p.Activity === activity && normalizeDate(p.Date) === normalizeDate(item.Date)
+    );
+    saveDeleted('Itinerary_pre', String(origIdx));
+  } else {
+    saveDeleted('Itinerary', String(item._row));
+    await deleteRemote('Itinerary', item._row);
+  }
+  await postData('Itinerary', newRow);
+
+  document.getElementById('ei-status').textContent = '✓ Saved!';
+  document.getElementById('ei-status').className = 'status-msg success-msg';
+  setTimeout(() => { closeEditModal(); renderItinerary(); }, 3000);
+}
+
+// ── ACCOMMODATION EDIT ──
+let _aItems = [], _aEditIdx = null;
+
+function openEditAcc(idx) {
+  _aEditIdx = idx;
+  const item = _aItems[idx];
+  document.getElementById('ea-dates').value = item.Dates || '';
+  document.getElementById('ea-hotel').value = item.Hotel || '';
+  document.getElementById('ea-location').value = item.Location || '';
+  setSelectValue('ea-status', item.Status || 'TBD');
+  document.getElementById('ea-status-msg').textContent = '';
+  document.getElementById('edit-acc-modal').classList.add('open');
+}
+
+function closeEditAcc() {
+  document.getElementById('edit-acc-modal').classList.remove('open');
+  _aEditIdx = null;
+}
+
+async function saveEditAcc() {
+  const item = _aItems[_aEditIdx];
+  const newRow = [
+    document.getElementById('ea-dates').value,
+    document.getElementById('ea-hotel').value,
+    document.getElementById('ea-location').value,
+    document.getElementById('ea-status').value,
+  ];
+  document.getElementById('ea-status-msg').textContent = 'Saving...';
+  if (item._pre) {
+    const origIdx = preloadedAccommodation.findIndex(p => p.Hotel === item.Hotel && p.Dates === item.Dates);
+    saveDeleted('Accommodation_pre', String(origIdx));
+  } else {
+    saveDeleted('Accommodation', String(item._row));
+    await deleteRemote('Accommodation', item._row);
+  }
+  await postData('Accommodation', newRow);
+  document.getElementById('ea-status-msg').textContent = '✓ Saved!';
+  document.getElementById('ea-status-msg').className = 'status-msg success-msg';
+  setTimeout(() => { closeEditAcc(); renderAccommodation(); }, 3000);
+}
+
+// ── BUDGET EDIT ──
+let _bItems = [], _bEditIdx = null;
+
+function openEditBudget(idx) {
+  _bEditIdx = idx;
+  const item = _bItems[idx];
+  setSelectValue('eb-category', item.Category || 'Food');
+  document.getElementById('eb-item').value = item.Item || '';
+  document.getElementById('eb-estimated').value = item['Estimated Cost (USD)'] || '';
+  document.getElementById('eb-actual').value = item['Actual Cost'] || '';
+  setSelectValue('eb-status', item.Status || 'Planned');
+  document.getElementById('eb-status-msg').textContent = '';
+  document.getElementById('edit-budget-modal').classList.add('open');
+}
+
+function closeEditBudget() {
+  document.getElementById('edit-budget-modal').classList.remove('open');
+  _bEditIdx = null;
+}
+
+async function saveEditBudget() {
+  const item = _bItems[_bEditIdx];
+  const newRow = [
+    document.getElementById('eb-category').value,
+    document.getElementById('eb-item').value,
+    document.getElementById('eb-estimated').value,
+    document.getElementById('eb-actual').value,
+    document.getElementById('eb-status').value,
+  ];
+  document.getElementById('eb-status-msg').textContent = 'Saving...';
+  if (item._pre) {
+    const origIdx = preloadedBudget.findIndex(p => p.Item === item.Item && p.Category === item.Category);
+    saveDeleted('Budget_pre', String(origIdx));
+  } else {
+    saveDeleted('Budget', String(item._row));
+    await deleteRemote('Budget', item._row);
+  }
+  await postData('Budget', newRow);
+  document.getElementById('eb-status-msg').textContent = '✓ Saved!';
+  document.getElementById('eb-status-msg').className = 'status-msg success-msg';
+  setTimeout(() => { closeEditBudget(); renderBudget(); }, 3000);
+}
+
+async function postData(tab, row) {
+  await fetch(API, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify({ tab, row }),
+  });
+}
+
+async function deleteRemote(tab, rowIndex) {
+  await fetch(API, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify({ action: 'delete', tab, rowIndex }),
+  });
+}
+
+function getDeleted(tab) {
+  return JSON.parse(localStorage.getItem(`deleted_${tab}`) || '[]');
+}
+
+function saveDeleted(tab, key) {
+  const list = getDeleted(tab);
+  if (!list.includes(key)) list.push(key);
+  localStorage.setItem(`deleted_${tab}`, JSON.stringify(list));
+}
+
+function deleteBtn(onclick) {
+  return `<td><button onclick="${onclick}" style="background:none;border:none;color:#c0392b;font-size:16px;cursor:pointer;padding:2px 6px;">×</button></td>`;
+}
+
+// RENDER ITINERARY
+async function renderItinerary() {
+  const remote = await fetchData('Itinerary');
+  const deletedPreload = getDeleted('Itinerary_pre');
+  const deletedRemote = getDeleted('Itinerary');
+
+  const preload = preloadedItinerary
+    .filter((_, i) => !deletedPreload.includes(String(i)))
+    .map(r => ({ ...r, _pre: true }));
+
+  const remoteFiltered = remote.filter(r => !deletedRemote.includes(String(r._row)));
+  const all = [...preload, ...remoteFiltered];
+
+  const grouped = {};
+  all.forEach(r => {
+    const d = normalizeDate(r.Date);
+    if (!grouped[d]) grouped[d] = [];
+    grouped[d].push(r);
+  });
+  Object.keys(grouped).forEach(d => {
+    grouped[d].sort((a, b) => parseTimeMinutes(a.Time) - parseTimeMinutes(b.Time));
+  });
+
+  const dayOfWeek = {
+    'May 1': 'Friday', 'May 2': 'Saturday', 'May 3': 'Sunday',
+    'May 4': 'Monday', 'May 5': 'Tuesday', 'May 6': 'Wednesday',
+    'May 7': 'Thursday', 'May 8': 'Friday'
+  };
+
+  const days = Object.keys(grouped).sort((a, b) => {
+    const parse = d => { const m = d.match(/(\d+)/); return m ? parseInt(m[1]) : 99; };
+    return parse(a) - parse(b);
+  });
+
+  _iItems = [];
+  days.forEach(day => grouped[day].forEach(r => _iItems.push(r)));
+
+  let globalIdx = 0;
+  let html = '';
+  days.forEach(day => {
+    const dow = dayOfWeek[day] ? ` · ${dayOfWeek[day]}` : '';
+    html += `<div class="day-header">📅 ${day}${dow}</div>`;
+    html += `<div class="card"><table><colgroup><col style="width:80px"><col><col style="width:90px"><col><col style="width:56px"></colgroup><tr><th>Time</th><th>Activity</th><th>Category</th><th>Notes</th><th></th></tr>`;
+    grouped[day].forEach(r => {
+      const idx = globalIdx++;
+      const delFn = r._pre
+        ? `deletePreload('Itinerary_pre',${preloadedItinerary.findIndex(p => p.Activity===r.Activity&&p.Date===r.Date&&p.Time===r.Time)},renderItinerary)`
+        : `deleteSheetRow('Itinerary',${r._row},renderItinerary)`;
+      html += `<tr>
+        <td>${formatTime(r.Time)}</td>
+        <td>${resolveActivity(r)}</td>
+        <td>${r.Category||''}</td>
+        <td>${r.Notes||''}</td>
+        <td style="white-space:nowrap">
+          <button onclick="openEditItinerary(${idx})" style="background:none;border:none;color:#1a73e8;font-size:15px;cursor:pointer;padding:2px 4px;" title="Edit">✎</button>
+          <button onclick="${delFn}" style="background:none;border:none;color:#c0392b;font-size:16px;cursor:pointer;padding:2px 4px;" title="Delete">×</button>
+        </td>
+      </tr>`;
+    });
+    html += `</table></div>`;
+  });
+  document.getElementById('itinerary-list').innerHTML = html;
+}
+
+// RENDER ACCOMMODATION
+async function renderAccommodation() {
+  const remote = await fetchData('Accommodation');
+  const deletedPre = getDeleted('Accommodation_pre');
+  const deletedRemote = getDeleted('Accommodation');
+
+  const preload = preloadedAccommodation
+    .filter((_, i) => !deletedPre.includes(String(i)))
+    .map(r => ({ ...r, _pre: true }));
+
+  const remoteFiltered = remote.filter(r => !deletedRemote.includes(String(r._row)));
+  const all = [...preload, ...remoteFiltered];
+
+  _aItems = all;
+  let html = '<div class="card"><table><colgroup><col style="width:100px"><col><col style="width:90px"><col style="width:80px"><col style="width:56px"></colgroup><tr><th>Dates</th><th>Hotel</th><th>Location</th><th>Status</th><th></th></tr>';
+  all.forEach((r, idx) => {
+    const badge = r.Status === 'Confirmed' ? 'confirmed' : 'tbd';
+    const delFn = r._pre
+      ? `deletePreload('Accommodation_pre',${preloadedAccommodation.findIndex(p=>p.Hotel===r.Hotel&&p.Dates===r.Dates)},renderAccommodation)`
+      : `deleteSheetRow('Accommodation',${r._row},renderAccommodation)`;
+    html += `<tr>
+      <td>${r.Dates||''}</td>
+      <td>${r.Hotel||''}</td>
+      <td>${r.Location||''}</td>
+      <td><span class="badge ${badge}">${r.Status||''}</span></td>
+      <td style="white-space:nowrap">
+        <button onclick="openEditAcc(${idx})" style="background:none;border:none;color:#1a73e8;font-size:15px;cursor:pointer;padding:2px 4px;" title="Edit">✎</button>
+        <button onclick="${delFn}" style="background:none;border:none;color:#c0392b;font-size:16px;cursor:pointer;padding:2px 4px;" title="Delete">×</button>
+      </td>
+    </tr>`;
+  });
+  html += '</table></div>';
+  document.getElementById('accommodation-list').innerHTML = html;
+}
+
+// RENDER BUDGET
+async function renderBudget() {
+  const remote = await fetchData('Budget');
+  const deletedPre = getDeleted('Budget_pre');
+  const deletedRemote = getDeleted('Budget');
+
+  const preload = preloadedBudget
+    .filter((_, i) => !deletedPre.includes(String(i)))
+    .map(r => ({ ...r, _pre: true }));
+
+  const remoteFiltered = remote.filter(r => !deletedRemote.includes(String(r._row)));
+  const all = [...preload, ...remoteFiltered];
+
+  let totalEst = 0, totalAct = 0;
+  all.forEach(r => {
+    totalEst += parseFloat(r['Estimated Cost (USD)']) || 0;
+    totalAct += parseFloat(r['Actual Cost']) || 0;
+  });
+
+  _bItems = all;
+  let html = '<div class="card"><table><colgroup><col style="width:100px"><col><col style="width:75px"><col style="width:85px"><col style="width:70px"><col style="width:56px"></colgroup><tr><th>Category</th><th>Item</th><th>Est. $</th><th>Actual $</th><th>Status</th><th></th></tr>';
+  all.forEach((r, idx) => {
+    const delFn = r._pre
+      ? `deletePreload('Budget_pre',${preloadedBudget.findIndex(p=>p.Item===r.Item&&p.Category===r.Category)},renderBudget)`
+      : `deleteSheetRow('Budget',${r._row},renderBudget)`;
+    html += `<tr>
+      <td>${r.Category||''}</td>
+      <td>${r.Item||''}</td>
+      <td>${r['Estimated Cost (USD)']||'—'}</td>
+      <td>${r['Actual Cost']||'—'}</td>
+      <td>${r.Status||''}</td>
+      <td style="white-space:nowrap">
+        <button onclick="openEditBudget(${idx})" style="background:none;border:none;color:#1a73e8;font-size:15px;cursor:pointer;padding:2px 4px;" title="Edit">✎</button>
+        <button onclick="${delFn}" style="background:none;border:none;color:#c0392b;font-size:16px;cursor:pointer;padding:2px 4px;" title="Delete">×</button>
+      </td>
+    </tr>`;
+  });
+  html += `<tr class="total-row"><td colspan="2">Total</td><td>$${totalEst.toFixed(2)}</td><td>$${totalAct.toFixed(2)}</td><td></td><td></td></tr>`;
+  html += '</table></div>';
+  document.getElementById('budget-list').innerHTML = html;
+}
+
+function deletePreload(tab, idx, rerender) {
+  if (!confirm('Delete this item?')) return;
+  saveDeleted(tab, String(idx));
+  rerender();
+}
+
+async function deleteSheetRow(tab, rowIndex, rerender) {
+  if (!confirm('Delete this item?')) return;
+  saveDeleted(tab, String(rowIndex));
+  await deleteRemote(tab, rowIndex);
+  setTimeout(rerender, 2000);
+}
+
+// ADD FUNCTIONS
+async function addItinerary() {
+  const row = [
+    toDateCode(document.getElementById('i-date').value),   // "May 6" → "D06"
+    toTimeCode(document.getElementById('i-time').value),   // "3:30pm" → "T1530"
+    document.getElementById('i-activity').value,
+    document.getElementById('i-category').value,
+    document.getElementById('i-notes').value,
+  ];
+  document.getElementById('i-status').textContent = 'Saving...';
+  await postData('Itinerary', row);
+  document.getElementById('i-status').textContent = '✓ Saved! Refreshing...';
+  document.getElementById('i-status').className = 'status-msg success-msg';
+  setTimeout(() => renderItinerary(), 3000);
+}
+
+async function addAccommodation() {
+  const row = [
+    document.getElementById('a-dates').value,
+    document.getElementById('a-hotel').value,
+    document.getElementById('a-location').value,
+    document.getElementById('a-status').value,
+  ];
+  document.getElementById('a-status-msg').textContent = 'Saving...';
+  await postData('Accommodation', row);
+  document.getElementById('a-status-msg').textContent = '✓ Saved! Refreshing...';
+  document.getElementById('a-status-msg').className = 'status-msg success-msg';
+  setTimeout(() => renderAccommodation(), 2000);
+}
+
+async function addBudget() {
+  const row = [
+    document.getElementById('b-category').value,
+    document.getElementById('b-item').value,
+    document.getElementById('b-estimated').value,
+    document.getElementById('b-actual').value,
+    document.getElementById('b-status').value,
+  ];
+  document.getElementById('b-status-msg').textContent = 'Saving...';
+  await postData('Budget', row);
+  document.getElementById('b-status-msg').textContent = '✓ Saved! Refreshing...';
+  document.getElementById('b-status-msg').className = 'status-msg success-msg';
+  setTimeout(() => renderBudget(), 2000);
+}
+
+// Init
+populateTimeDropdown();
+renderItinerary();
+renderAccommodation();
+renderBudget();
+</script>
+</body>
+</html>
