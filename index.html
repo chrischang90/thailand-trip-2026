@@ -134,8 +134,13 @@
       </select>
     </div>
     <div class="form-group"><label>Item</label><input id="b-item" placeholder="Dinner @ Fuego"/></div>
-    <div class="form-group"><label>Estimated Cost (USD)</label><input id="b-estimated" type="number" placeholder="0"/></div>
-    <div class="form-group"><label>Actual Cost (USD)</label><input id="b-actual" type="number" placeholder="0"/></div>
+    <div class="form-group"><label>Payee</label><input id="b-payee" placeholder="Chris"/></div>
+    <div class="form-group"><label>Actual Cost</label>
+      <div style="display:flex;gap:8px">
+        <input id="b-actual" type="number" placeholder="0" style="flex:1"/>
+        <select id="b-act-currency" style="width:75px"><option>USD</option><option>NTD</option><option>THB</option></select>
+      </div>
+    </div>
     <div class="form-group"><label>Status</label>
       <select id="b-status"><option>Planned</option><option>Paid</option><option>TBD</option></select>
     </div>
@@ -174,8 +179,13 @@
       </select>
     </div>
     <div class="form-group"><label>Item</label><input id="eb-item"/></div>
-    <div class="form-group"><label>Estimated Cost (USD)</label><input id="eb-estimated" type="number"/></div>
-    <div class="form-group"><label>Actual Cost (USD)</label><input id="eb-actual" type="number"/></div>
+    <div class="form-group"><label>Payee</label><input id="eb-payee"/></div>
+    <div class="form-group"><label>Actual Cost</label>
+      <div style="display:flex;gap:8px">
+        <input id="eb-actual" type="number" style="flex:1"/>
+        <select id="eb-act-currency" style="width:75px"><option>USD</option><option>NTD</option><option>THB</option></select>
+      </div>
+    </div>
     <div class="form-group"><label>Status</label>
       <select id="eb-status"><option>Planned</option><option>Paid</option><option>TBD</option></select>
     </div>
@@ -227,6 +237,44 @@ const preloadedItinerary = [];
 const preloadedAccommodation = [];
 const preloadedBudget = [];
 
+// FX: rates fetched from open.er-api.com (base USD), NTD shown as TWD in API
+const FX_FALLBACK = { USD: 1, TWD: 32, THB: 34 };
+let _fxRates = null;
+
+async function fetchRates() {
+  const CACHE_KEY = 'fx_rates_v2';
+  const CACHE_TS  = 'fx_rates_ts_v2';
+  const cached = localStorage.getItem(CACHE_KEY);
+  const ts     = parseInt(localStorage.getItem(CACHE_TS) || '0');
+  if (cached && Date.now() - ts < 24 * 60 * 60 * 1000) {
+    _fxRates = JSON.parse(cached); return;
+  }
+  try {
+    const res  = await fetch('https://open.er-api.com/v6/latest/USD');
+    const data = await res.json();
+    if (data.rates) {
+      _fxRates = data.rates;
+      localStorage.setItem(CACHE_KEY, JSON.stringify(_fxRates));
+      localStorage.setItem(CACHE_TS, String(Date.now()));
+    }
+  } catch { /* fall through to fallback */ }
+  if (!_fxRates) _fxRates = FX_FALLBACK;
+}
+
+// 'NTD' maps to 'TWD' in the API
+function apiCode(c) { return c === 'NTD' ? 'TWD' : (c || 'USD'); }
+
+function toNTD(amount, currency) {
+  const amt = parseFloat(amount) || 0;
+  if (!amt) return 0;
+  const rates = _fxRates || FX_FALLBACK;
+  const code  = apiCode(currency);
+  if (code === 'TWD') return amt;
+  const twd = rates['TWD'] || 32;
+  const cur = rates[code]  || 1;
+  return amt * (twd / cur);
+}
+
 function showTab(tab) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -240,8 +288,13 @@ function toggleForm(id) {
 
 async function fetchData(tab) {
   try {
-    const res = await fetch(`${API}?tab=${tab}`);
-    return await res.json();
+    const res  = await fetch(`${API}?tab=${tab}`);
+    const data = await res.json();
+    return data.map(row => {
+      const clean = {};
+      Object.entries(row).forEach(([k, v]) => clean[k.trim()] = typeof v === 'string' ? v.trim() : v);
+      return clean;
+    });
   } catch { return []; }
 }
 
@@ -497,8 +550,9 @@ function openEditBudget(idx) {
   const item = _bItems[idx];
   setSelectValue('eb-category', item.Category || 'Food');
   document.getElementById('eb-item').value = item.Item || '';
-  document.getElementById('eb-estimated').value = item['Estimated Cost (USD)'] || '';
+  document.getElementById('eb-payee').value = item.Payee || '';
   document.getElementById('eb-actual').value = item['Actual Cost'] || '';
+  setSelectValue('eb-act-currency', item['Act Currency'] || 'USD');
   setSelectValue('eb-status', item.Status || 'Planned');
   document.getElementById('eb-status-msg').textContent = '';
   document.getElementById('edit-budget-modal').classList.add('open');
@@ -514,8 +568,9 @@ async function saveEditBudget() {
   const newRow = [
     document.getElementById('eb-category').value,
     document.getElementById('eb-item').value,
-    document.getElementById('eb-estimated').value,
+    document.getElementById('eb-payee').value,
     document.getElementById('eb-actual').value,
+    document.getElementById('eb-act-currency').value,
     document.getElementById('eb-status').value,
   ];
   document.getElementById('eb-status-msg').textContent = 'Saving...';
@@ -674,23 +729,24 @@ async function renderBudget() {
   const remoteFiltered = remote.filter(r => !deletedRemote.includes(String(r._row)));
   const all = [...preload, ...remoteFiltered];
 
-  let totalEst = 0, totalAct = 0;
+  let totalActNTD = 0;
   all.forEach(r => {
-    totalEst += parseFloat(r['Estimated Cost (USD)']) || 0;
-    totalAct += parseFloat(r['Actual Cost']) || 0;
+    totalActNTD += toNTD(r['Actual Cost'], r['Act Currency']);
   });
 
   _bItems = all;
-  let html = '<div class="card"><table><colgroup><col style="width:100px"><col><col style="width:75px"><col style="width:85px"><col style="width:70px"><col style="width:56px"></colgroup><tr><th>Category</th><th>Item</th><th>Est. $</th><th>Actual $</th><th>Status</th><th></th></tr>';
+  let html = '<div class="card"><table><colgroup><col style="width:90px"><col><col style="width:75px"><col style="width:110px"><col style="width:65px"><col style="width:56px"></colgroup>';
+  html += '<tr><th>Category</th><th>Item</th><th>Payee</th><th>Actual</th><th>Status</th><th></th></tr>';
   all.forEach((r, idx) => {
     const delFn = r._pre
       ? `deletePreload('Budget_pre',${preloadedBudget.findIndex(p=>p.Item===r.Item&&p.Category===r.Category)},renderBudget)`
       : `deleteSheetRow('Budget',${r._row},renderBudget)`;
+    const actAmt = r['Actual Cost'] ? `${r['Actual Cost']} ${r['Act Currency']||'USD'}` : '—';
     html += `<tr>
       <td>${r.Category||''}</td>
       <td>${r.Item||''}</td>
-      <td>${r['Estimated Cost (USD)']||'—'}</td>
-      <td>${r['Actual Cost']||'—'}</td>
+      <td>${r.Payee||''}</td>
+      <td>${actAmt}</td>
       <td>${r.Status||''}</td>
       <td style="white-space:nowrap">
         <button onclick="openEditBudget(${idx})" style="background:none;border:none;color:#1a73e8;font-size:15px;cursor:pointer;padding:2px 4px;" title="Edit">✎</button>
@@ -698,8 +754,33 @@ async function renderBudget() {
       </td>
     </tr>`;
   });
-  html += `<tr class="total-row"><td colspan="2">Total</td><td>$${totalEst.toFixed(2)}</td><td>$${totalAct.toFixed(2)}</td><td></td><td></td></tr>`;
+  html += `<tr class="total-row"><td colspan="3">Total (NTD)</td><td>NTD ${Math.round(totalActNTD).toLocaleString()}</td><td></td><td></td></tr>`;
   html += '</table></div>';
+
+  // Payee summary — Paid items only, converted to NTD
+  const payeeSums = {};
+  all.forEach(r => {
+    if (r.Status !== 'Paid') return;
+    const payee = (r.Payee || '').trim() || 'Unassigned';
+    payeeSums[payee] = (payeeSums[payee] || 0) + toNTD(r['Actual Cost'], r['Act Currency']);
+  });
+
+  if (Object.keys(payeeSums).length > 0) {
+    let grandTotal = 0, rows = '';
+    Object.entries(payeeSums).forEach(([payee, total]) => {
+      grandTotal += total;
+      rows += `<tr><td>${payee}</td><td>NTD ${Math.round(total).toLocaleString()}</td></tr>`;
+    });
+    html += `<div class="card" style="margin-top:4px">
+      <h3>💳 Payee Summary (Paid Items)</h3>
+      <table><colgroup><col><col style="width:160px"></colgroup>
+        <tr><th>Payee</th><th>Total Paid (NTD)</th></tr>
+        ${rows}
+        <tr class="total-row"><td>Grand Total</td><td>NTD ${Math.round(grandTotal).toLocaleString()}</td></tr>
+      </table>
+    </div>`;
+  }
+
   document.getElementById('budget-list').innerHTML = html;
 }
 
@@ -750,8 +831,9 @@ async function addBudget() {
   const row = [
     document.getElementById('b-category').value,
     document.getElementById('b-item').value,
-    document.getElementById('b-estimated').value,
+    document.getElementById('b-payee').value,
     document.getElementById('b-actual').value,
+    document.getElementById('b-act-currency').value,
     document.getElementById('b-status').value,
   ];
   document.getElementById('b-status-msg').textContent = 'Saving...';
@@ -765,7 +847,7 @@ async function addBudget() {
 populateTimeDropdown();
 renderItinerary();
 renderAccommodation();
-renderBudget();
+fetchRates().then(() => renderBudget());
 </script>
 </body>
 </html>
